@@ -1,0 +1,42 @@
+package main
+import (
+	"net/http"
+	"github.com/gin-gonic/gin"
+)
+
+type book struct {
+    ID     string  `json:"id"`
+    Title  string  `json:"title"`
+    Writer string  `json:"writer"`
+    Price  float64 `json:"price"`
+}
+
+var books = []book{
+    {ID: "1", Title: "Blue Train", Writer: "John Coltrane", Price: 56.99},
+    {ID: "2", Title: "Jeru", Writer: "Gerry Mulligan", Price: 17.99},
+    {ID: "3", Title: "Sarah Vaughan and Clifford Brown", Writer: "Sarah Vaughan", Price: 39.99},
+}
+
+
+func getBooks(c *gin.Context) {
+	c.IndentedJSON(http.StatusOK, books)
+}
+
+func main() {
+	router := gin.Default()
+	router.GET("/books", getBooks)
+	router.POST("/books", postBooks)
+	
+	router.Run("localhost:8000")
+}
+
+
+func postBooks(c *gin.Context) {
+	var newBook book
+	if err := c.BindJSON(&newBook); err != nil {
+		return
+	}
+
+	books = append(books, newBook)
+	c.IndentedJSON(http.StatusCreated, newBook)
+}
